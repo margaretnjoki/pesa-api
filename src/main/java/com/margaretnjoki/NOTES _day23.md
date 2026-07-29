@@ -129,7 +129,7 @@ This guarantees that the timestamp and the password are generated exactly as Saf
 
 ---
 
-## What I should remember
+## points to remember
 
 * `@RestController` receives HTTP requests.
 * `RestClient` sends HTTP requests.
