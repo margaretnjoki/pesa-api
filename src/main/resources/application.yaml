@@ -1,3 +1,10 @@
 spring:
   application:
     name: pesa-api
+mpesa:
+  consumer-key: ${MPESA_CONSUMER_KEY}
+  consumer-secret: ${MPESA_CONSUMER_SECRET}
+  shortcode: ${MPESA_SHORTCODE:174379}
+  passkey: ${MPESA_PASSKEY}
+  callback-url: ${MPESA_CALLBACK_URL}
+  base-url: https://sandbox.safaricom.co.ke
