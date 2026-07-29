@@ -3,6 +3,7 @@ package com.margaretnjoki.pesaapi.service;
 import com.margaretnjoki.pesaapi.dto.MpesaAuthResponse;
 import com.margaretnjoki.pesaapi.dto.StkPushRequest;
 import com.margaretnjoki.pesaapi.dto.StkPushResponse;
+import com.margaretnjoki.pesaapi.dto.TokenStatusResponse;
 import com.margaretnjoki.pesaapi.mpesa.MpesaProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -60,7 +61,6 @@ public class MpesaService {
                 .format(Instant.now());
         String rawPassword = properties.getShortcode() + properties.getPasskey() + timestamp ;
         String password = Base64.getEncoder().encodeToString(rawPassword.getBytes(StandardCharsets.UTF_8));
-        log.info("Timestamp: {}", timestamp);
         StkPushRequest request= new StkPushRequest(
              properties.getShortcode(),
              password,
@@ -84,5 +84,13 @@ public class MpesaService {
                 .retrieve()
                 .body(StkPushResponse.class);
 
+    }
+
+    public TokenStatusResponse tokenstatus(){
+        boolean isCached = cachedToken != null && Instant.now().isBefore(tokenExpiresAt);
+        return new TokenStatusResponse(
+                isCached,
+                isCached ? tokenExpiresAt : null
+        );
     }
 }
