@@ -1,6 +1,18 @@
 spring:
   application:
     name: pesa-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pesa_api_db
+    username: postgres
+    password: ${DB_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
 mpesa:
   consumer-key: ${MPESA_CONSUMER_KEY}
   consumer-secret: ${MPESA_CONSUMER_SECRET}

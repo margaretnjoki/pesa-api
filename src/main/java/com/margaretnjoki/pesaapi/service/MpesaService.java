@@ -1,32 +1,39 @@
 package com.margaretnjoki.pesaapi.service;
 
-import com.margaretnjoki.pesaapi.dto.MpesaAuthResponse;
-import com.margaretnjoki.pesaapi.dto.StkPushRequest;
-import com.margaretnjoki.pesaapi.dto.StkPushResponse;
-import com.margaretnjoki.pesaapi.dto.TokenStatusResponse;
+import com.margaretnjoki.pesaapi.dto.*;
+import com.margaretnjoki.pesaapi.model.MpesaTransaction;
+import com.margaretnjoki.pesaapi.model.TransactionStatus;
 import com.margaretnjoki.pesaapi.mpesa.MpesaProperties;
+import com.margaretnjoki.pesaapi.repository.MpesaTransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @Slf4j
 public class MpesaService {
     private final RestClient restClient;
     private final MpesaProperties properties;
+    private final MpesaTransactionRepository mpesaTransactionRepository;
 
     private String cachedToken;
     private Instant tokenExpiresAt = Instant.EPOCH;
 
-    public MpesaService(RestClient restClient, MpesaProperties properties) {
+    public MpesaService(RestClient restClient, MpesaProperties properties, MpesaTransactionRepository mpesaTransactionRepository) {
         this.restClient = restClient;
         this.properties = properties;
+        this.mpesaTransactionRepository = mpesaTransactionRepository;
     }
 
     public String getAccessToken() {
@@ -55,7 +62,7 @@ public class MpesaService {
         return cachedToken;
     }
 
-    public StkPushResponse initiateStkPush(String phoneNumber, String amount){
+    public StkPushResponse initiateStkPush(String phoneNumber, String amount,String accountRef){
         String timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
                 .withZone(ZoneId.of("Africa/Nairobi"))
                 .format(Instant.now());
@@ -77,13 +84,25 @@ public class MpesaService {
 
         log.info("Initiating STK push: phone={}, amount={}", phoneNumber, amount);
 
-        return restClient.post()
+        StkPushResponse response = restClient.post()
                 .uri("/mpesa/stkpush/v1/processrequest")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
                 .body(request)
                 .retrieve()
                 .body(StkPushResponse.class);
 
+        MpesaTransaction transaction = MpesaTransaction.builder()
+                .phoneNumber(phoneNumber)
+                .amount(new BigDecimal(amount))
+                .accountReference(accountRef)
+                .status(TransactionStatus.PENDING)
+                .merchantRequestId(response.merchantRequestId())
+                .checkoutRequestId(response.checkoutRequestId())
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+        mpesaTransactionRepository.save(transaction);
+        return response;
     }
 
     public TokenStatusResponse tokenstatus(){
@@ -93,4 +112,22 @@ public class MpesaService {
                 isCached ? tokenExpiresAt : null
         );
     }
+
+  public MpesaTransaction findTransactionById(UUID id){
+        return mpesaTransactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+  }
+
+  public List<MpesaTransaction> findAll(){
+        log.info("get all transactions");
+        return mpesaTransactionRepository.findAll();
+
+  }
+
+  public List<MpesaTransactionResponse> findByPhoneNumberOrderByCreatedAtDesc(String phoneNumber){
+        log.info("finding all the transactions for phoneNumber: {}", phoneNumber);
+        return mpesaTransactionRepository.findByPhoneNumberOrderByCreatedAtDesc(phoneNumber)
+                .stream()
+                .map(MpesaTransactionResponse ::from)
+                .toList();
+  }
 }

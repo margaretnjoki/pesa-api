@@ -8,6 +8,7 @@ public record StkPushInitiateRequest(
         @Pattern(regexp = "^254[17][0-9]{8}$", message = "phone must be in format 2547XXXXXXXX or 2541XXXXXXXX")
         String phoneNumber,
 
-        @NotBlank String amount
+        @NotBlank String amount,
+        @NotBlank String accountRef
 ) {
 }
