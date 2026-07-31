@@ -37,8 +37,6 @@ public class MpesaService {
     }
 
     public String getAccessToken() {
-        log.info("Consumer Key: {}", properties.getConsumerKey());
-        log.info("Consumer Secret: {}", properties.getConsumerSecret());
         log.info("Base URL: {}", properties.getBaseUrl());
 
         if (cachedToken != null && Instant.now().isBefore(tokenExpiresAt)) {
