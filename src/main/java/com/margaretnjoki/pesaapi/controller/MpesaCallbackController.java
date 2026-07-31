@@ -16,14 +16,14 @@ import java.util.Map;
 public class MpesaCallbackController {
     private final MpesaCallbackService callbackService;
 
-
     public MpesaCallbackController(MpesaCallbackService callbackService) {
         this.callbackService = callbackService;
     }
+
     @PostMapping("/callback")
-    public Map<String, Object> receiveCallback(@RequestBody StkCallbackPayload payload){
+    public Map<String, Object> receiveCallback(@RequestBody StkCallbackPayload payload) {
         log.info("callback received");
-        try{
+        try {
             callbackService.process(payload);
         } catch (Exception e) {
             log.error("Error processing M-Pesa callback", e);

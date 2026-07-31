@@ -9,6 +9,5 @@ import java.util.UUID;
 
 public interface MpesaTransactionRepository extends JpaRepository<MpesaTransaction, UUID> {
    Optional <MpesaTransaction> findByCheckoutRequestId(String checkoutRequestId);
-
     List<MpesaTransaction> findByPhoneNumberOrderByCreatedAtDesc(String phoneNumber);
 }

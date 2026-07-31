@@ -1,6 +1,8 @@
 spring:
   application:
     name: pesa-api
+  profiles:
+    active: prod
 
   datasource:
     url: jdbc:postgresql://localhost:5432/pesa_api_db

@@ -1,0 +1,22 @@
+mpesa:
+  consumer-key: ${MPESA_CONSUMER_KEY}
+  consumer-secret: ${MPESA_CONSUMER_SECRET}
+  shortcode: ${MPESA_SHORTCODE}
+  passkey: ${MPESA_PASSKEY}
+  callback-url: ${MPESA_CALLBACK_URL}
+  base-url: https://sandbox.safaricom.co.ke
+
+server:
+    port: ${PORT:8080}
+
+spring:
+    datasource:
+      url: ${DATABASE_URL}
+      username: ${DATABASE_USERNAME}
+      password: ${DATABASE_PASSWORD}
+
+
+logging:
+    level:
+      com.margaretnjoki.expensetracker: INFO
+      root: WARN

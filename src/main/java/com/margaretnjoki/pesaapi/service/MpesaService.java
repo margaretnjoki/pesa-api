@@ -62,17 +62,17 @@ public class MpesaService {
         return cachedToken;
     }
 
-    public StkPushResponse initiateStkPush(String phoneNumber, String amount,String accountRef){
+    public StkPushResponse initiateStkPush(String phoneNumber, String amount, String accountRef) {
         String timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
                 .withZone(ZoneId.of("Africa/Nairobi"))
                 .format(Instant.now());
-        String rawPassword = properties.getShortcode() + properties.getPasskey() + timestamp ;
+        String rawPassword = properties.getShortcode() + properties.getPasskey() + timestamp;
         String password = Base64.getEncoder().encodeToString(rawPassword.getBytes(StandardCharsets.UTF_8));
-        StkPushRequest request= new StkPushRequest(
-             properties.getShortcode(),
-             password,
-              timestamp,
-              "CustomerPayBillOnline",
+        StkPushRequest request = new StkPushRequest(
+                properties.getShortcode(),
+                password,
+                timestamp,
+                "CustomerPayBillOnline",
                 amount,
                 phoneNumber,
                 properties.getShortcode(),
@@ -105,7 +105,7 @@ public class MpesaService {
         return response;
     }
 
-    public TokenStatusResponse tokenstatus(){
+    public TokenStatusResponse tokenstatus() {
         boolean isCached = cachedToken != null && Instant.now().isBefore(tokenExpiresAt);
         return new TokenStatusResponse(
                 isCached,
@@ -113,21 +113,21 @@ public class MpesaService {
         );
     }
 
-  public MpesaTransaction findTransactionById(UUID id){
+    public MpesaTransaction findTransactionById(UUID id) {
         return mpesaTransactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
-  }
+    }
 
-  public List<MpesaTransaction> findAll(){
+    public List<MpesaTransaction> findAll() {
         log.info("get all transactions");
         return mpesaTransactionRepository.findAll();
 
-  }
+    }
 
-  public List<MpesaTransactionResponse> findByPhoneNumberOrderByCreatedAtDesc(String phoneNumber){
+    public List<MpesaTransactionResponse> findByPhoneNumberOrderByCreatedAtDesc(String phoneNumber) {
         log.info("finding all the transactions for phoneNumber: {}", phoneNumber);
         return mpesaTransactionRepository.findByPhoneNumberOrderByCreatedAtDesc(phoneNumber)
                 .stream()
-                .map(MpesaTransactionResponse ::from)
+                .map(MpesaTransactionResponse::from)
                 .toList();
-  }
+    }
 }
