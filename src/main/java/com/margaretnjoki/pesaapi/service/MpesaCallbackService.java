@@ -1,5 +1,6 @@
 package com.margaretnjoki.pesaapi.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.margaretnjoki.pesaapi.dto.CallbackItem;
 import com.margaretnjoki.pesaapi.dto.CallbackMetadata;
 import com.margaretnjoki.pesaapi.dto.StkCallback;
@@ -9,7 +10,6 @@ import com.margaretnjoki.pesaapi.model.TransactionStatus;
 import com.margaretnjoki.pesaapi.repository.MpesaTransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 
